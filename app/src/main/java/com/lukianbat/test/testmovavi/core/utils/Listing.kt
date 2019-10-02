@@ -1,8 +1,7 @@
-package com.lukianbat.test.testmovavi.core.domain
+package com.lukianbat.test.testmovavi.core.utils
 
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
-import com.lukianbat.test.testmovavi.core.utils.NetworkState
 
 data class Listing<T>(
 
