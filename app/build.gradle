@@ -22,6 +22,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    dataBinding {
+        enabled = true
+    }
     androidExtensions {
         experimental = true
     }
@@ -46,10 +49,6 @@ dependencies {
     implementation "com.google.dagger:dagger-android-support:$dagger2_version"
     kapt "com.google.dagger:dagger-android-processor:$dagger2_version"
 
-    //MVP
-    implementation 'tech.schoolhelper:moxy-x:1.7.0'
-    kapt 'tech.schoolhelper:moxy-x-compiler:1.7.0'
-    implementation 'tech.schoolhelper:moxy-x-androidx:1.7.0'
 
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0-beta04'

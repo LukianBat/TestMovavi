@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TestMovavi</string>
+    <string name="retry">retry</string>
+    <string name="post_subtitle">subtitle</string>
 </resources>

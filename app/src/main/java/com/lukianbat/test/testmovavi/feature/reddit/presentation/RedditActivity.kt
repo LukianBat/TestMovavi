@@ -1,36 +1,22 @@
 package com.lukianbat.test.testmovavi.feature.reddit.presentation
 
-import android.os.Bundle
-import android.os.PersistableBundle
-import android.widget.Toast
-import com.arellomobile.mvp.MvpAppCompatActivity
-import com.arellomobile.mvp.presenter.InjectPresenter
-import com.arellomobile.mvp.presenter.ProvidePresenter
+import com.lukianbat.test.testmovavi.BR
 import com.lukianbat.test.testmovavi.R
-import dagger.Lazy
-import dagger.android.AndroidInjection
+import com.lukianbat.test.testmovavi.core.presentation.activity.EventsActivity
+import com.lukianbat.test.testmovavi.databinding.ActivityRedditBinding
 import javax.inject.Inject
 
+class RedditActivity :
+    EventsActivity<ActivityRedditBinding, RedditViewModel, RedditViewModel.EventsListener>(),
+    RedditViewModel.EventsListener {
+    override fun showMessage(msg: String) {
 
-class RedditActivity : MvpAppCompatActivity(), RedditView {
+    }
 
+    override val eventsListener: RedditViewModel.EventsListener = this
+    override val viewModelVariableId: Int = BR.viewModel
     @Inject
-    lateinit var daggerPresenter: Lazy<RedditPresenter>
+    override lateinit var viewModel: RedditViewModel
 
-    @InjectPresenter
-    lateinit var presenter: RedditPresenter
-
-    @ProvidePresenter
-    fun providePresenter(): RedditPresenter = daggerPresenter.get()
-
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        AndroidInjection.inject(this)
-        super.onCreate(savedInstanceState, persistentState)
-        setContentView(R.layout.activity_main)
-    }
-
-    override fun showMessage(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
-
+    override val layoutId = R.layout.activity_reddit
 }
