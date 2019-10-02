@@ -13,7 +13,4 @@ class App : DaggerApplication() {
             .context(this)
             .create(this)
 
-    companion object {
-        const val TOPIC = "all"
-    }
 }

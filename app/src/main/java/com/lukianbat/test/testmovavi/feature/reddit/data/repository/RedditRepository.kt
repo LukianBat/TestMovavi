@@ -15,12 +15,13 @@ import com.lukianbat.test.testmovavi.feature.reddit.domain.model.RedditPost
 import com.lukianbat.test.testmovavi.feature.reddit.domain.model.RedditRes
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
 interface RedditRepository {
     fun getPosts(): Listing<RedditPost>
 }
 
-class RedditRepositoryImpl constructor(
+class RedditRepositoryImpl @Inject constructor(
     private val apiDataSource: RedditApiDataSource,
     private val cacheDataSource: RedditCacheDataSource
 ) : RedditRepository {

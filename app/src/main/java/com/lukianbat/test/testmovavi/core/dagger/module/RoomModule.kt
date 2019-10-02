@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.lukianbat.test.testmovavi.core.data.AppDatabase
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
 @Module
 class RoomModule {

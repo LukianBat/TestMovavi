@@ -1,5 +1,6 @@
 package com.lukianbat.test.testmovavi.core.dagger.module
 
+import com.lukianbat.test.testmovavi.core.dagger.module.feature.RedditModule
 import dagger.Module
 import dagger.android.support.AndroidSupportInjectionModule
 
@@ -7,7 +8,8 @@ import dagger.android.support.AndroidSupportInjectionModule
     includes = [
         AndroidSupportInjectionModule::class,
         RetrofitModule::class,
-        RoomModule::class
+        RoomModule::class,
+        RedditModule::class
     ]
 )
 interface ApplicationModule

@@ -6,11 +6,14 @@ import com.lukianbat.test.testmovavi.feature.reddit.data.datasource.api.RedditAp
 import com.lukianbat.test.testmovavi.feature.reddit.data.datasource.api.RedditApiDataSourceImpl
 import dagger.Module
 import dagger.Provides
+import retrofit2.Retrofit
 
-@Module(includes = [ApiModule::class])
+@Module
 class ApiDataSourceModule {
 
-    @ActivityScope
+    @Provides
+    fun provideRedditApi(retrofit: Retrofit): RedditApi = retrofit.create(RedditApi::class.java)
+
     @Provides
     fun providesDataSource(api: RedditApi): RedditApiDataSource = RedditApiDataSourceImpl(api)
 }

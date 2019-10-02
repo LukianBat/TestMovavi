@@ -14,7 +14,6 @@ import javax.inject.Singleton
 class RetrofitModule {
 
     @Provides
-    @Singleton
     fun providesGoogleRetrofit(): Retrofit =
         Retrofit.Builder()
             .baseUrl(URL)
