@@ -1,33 +1,31 @@
-package com.lukianbat.test.testmovavi.feature.reddit.data.datasource.db.dagger
+package com.lukianbat.test.testmovavi.feature.reddit.data.datasource.db
 
 import androidx.paging.DataSource
-import com.lukianbat.test.testmovavi.feature.reddit.data.datasource.db.RedditPostDao
 import com.lukianbat.test.testmovavi.feature.reddit.domain.model.RedditPost
-import io.reactivex.Completable
-import io.reactivex.Single
 import javax.inject.Inject
 
 interface RedditCacheDataSource {
 
-    fun insert(posts: List<RedditPost>): Completable
-    fun getPosts(): DataSource.Factory<Int, RedditPost>
-    fun deletePosts(): Completable
-    fun getNextIndexPosts(): Single<Int>
+    fun insert(posts: List<RedditPost>)
+    fun posts(): DataSource.Factory<Int, RedditPost>
+    fun delete()
+    fun getNextIndex(): Int
 
 }
 
 class RedditCacheDataSourceImpl @Inject constructor(private val dao: RedditPostDao) :
     RedditCacheDataSource {
-    override fun insert(posts: List<RedditPost>): Completable =
-        dao.insert(posts)
 
-    override fun getPosts(): DataSource.Factory<Int, RedditPost> =
-        dao.getPosts()
+    override fun posts(): DataSource.Factory<Int, RedditPost> =
+        dao.posts()
 
-    override fun deletePosts(): Completable = dao.deletePosts()
+    override fun delete() = dao.delete()
 
 
-    override fun getNextIndexPosts(): Single<Int> = dao.getNextIndexInPosts()
+    override fun getNextIndex(): Int =
+        dao.getNextIndex()
+
+    override fun insert(posts: List<RedditPost>) = dao.insert(posts)
 
 
 }

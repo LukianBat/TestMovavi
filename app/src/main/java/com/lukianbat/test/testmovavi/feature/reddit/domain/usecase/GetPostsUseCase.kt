@@ -12,6 +12,6 @@ interface GetPostsUseCase {
 class GetPostsUseCaseImpl @Inject constructor(private val repository: RedditRepository) :
     GetPostsUseCase {
 
-    override fun getPosts(): Listing<RedditPost> = repository.getPosts()
+    override fun getPosts(): Listing<RedditPost> = repository.posts()
 
 }
