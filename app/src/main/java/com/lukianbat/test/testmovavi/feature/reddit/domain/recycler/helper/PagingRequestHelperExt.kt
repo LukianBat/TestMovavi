@@ -1,7 +1,8 @@
-package com.lukianbat.test.testmovavi.core.utils
+package com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.helper
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.boundary.NetworkState
 
 private fun getErrorMessage(report: PagingRequestHelper.StatusReport): String {
     return PagingRequestHelper.RequestType.values().mapNotNull {
@@ -15,7 +16,11 @@ fun PagingRequestHelper.createStatusLiveData(): LiveData<NetworkState> {
         when {
             report.hasRunning() -> liveData.postValue(NetworkState.LOADING)
             report.hasError() -> liveData.postValue(
-                NetworkState.error(getErrorMessage(report))
+                NetworkState.error(
+                    getErrorMessage(
+                        report
+                    )
+                )
             )
             else -> liveData.postValue(NetworkState.LOADED)
         }

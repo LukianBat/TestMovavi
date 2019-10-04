@@ -5,16 +5,16 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.lukianbat.test.testmovavi.R
-import com.lukianbat.test.testmovavi.core.utils.NetworkState
-import com.lukianbat.test.testmovavi.feature.reddit.domain.model.RedditPost
+import com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.boundary.NetworkState
+import com.lukianbat.test.testmovavi.feature.reddit.domain.model.BasePostImpl
 
 class PostsAdapter(
     private val retryCallback: () -> Unit
-) : PagedListAdapter<RedditPost, RecyclerView.ViewHolder>(POST_COMPARATOR) {
+) : PagedListAdapter<BasePostImpl, RecyclerView.ViewHolder>(POST_COMPARATOR) {
     private var networkState: NetworkState? = null
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (getItemViewType(position)) {
-            R.layout.reddit_post_item -> (holder as RedditPostViewHolder).bind(getItem(position))
+            R.layout.reddit_post_item -> (holder as PostItemViewHolder).bind(getItem(position))
             R.layout.network_state_item -> (holder as NetworkStateItemViewHolder).bindTo(
                 networkState
             )
@@ -28,7 +28,7 @@ class PostsAdapter(
     ) {
         if (payloads.isNotEmpty()) {
             val item = getItem(position)
-            (holder as RedditPostViewHolder).updateScore(item)
+            (holder as PostItemViewHolder).updateScore(item)
         } else {
             onBindViewHolder(holder, position)
         }
@@ -36,7 +36,7 @@ class PostsAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            R.layout.reddit_post_item -> RedditPostViewHolder.create(parent)
+            R.layout.reddit_post_item -> PostItemViewHolder.create(parent)
             R.layout.network_state_item -> NetworkStateItemViewHolder.create(parent, retryCallback)
             else -> throw IllegalArgumentException("unknown view type $viewType")
         }
@@ -73,15 +73,14 @@ class PostsAdapter(
     }
 
     companion object {
-        private val PAYLOAD_SCORE = Any()
-        val POST_COMPARATOR = object : DiffUtil.ItemCallback<RedditPost>() {
-            override fun areContentsTheSame(oldItem: RedditPost, newItem: RedditPost): Boolean =
-                oldItem == newItem
+        val POST_COMPARATOR = object : DiffUtil.ItemCallback<BasePostImpl>() {
+            override fun areContentsTheSame(oldItem: BasePostImpl, newItem: BasePostImpl): Boolean =
+                oldItem.equals(newItem)
 
-            override fun areItemsTheSame(oldItem: RedditPost, newItem: RedditPost): Boolean =
+            override fun areItemsTheSame(oldItem: BasePostImpl, newItem: BasePostImpl): Boolean =
                 oldItem.id == newItem.id
 
-            override fun getChangePayload(oldItem: RedditPost, newItem: RedditPost): Any? {
+            override fun getChangePayload(oldItem: BasePostImpl, newItem: BasePostImpl): Any? {
                 return null
             }
         }

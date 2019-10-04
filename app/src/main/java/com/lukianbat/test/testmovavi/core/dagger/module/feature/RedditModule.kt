@@ -3,7 +3,7 @@ package com.lukianbat.test.testmovavi.core.dagger.module.feature
 import com.lukianbat.test.testmovavi.core.dagger.scope.ActivityScope
 import com.lukianbat.test.testmovavi.feature.reddit.domain.dagger.GetPostsUseCaseModule
 import com.lukianbat.test.testmovavi.feature.reddit.presentation.PostsActivity
-import com.lukianbat.test.testmovavi.feature.reddit.presentation.dagger.RedditActivityModule
+import com.lukianbat.test.testmovavi.feature.reddit.presentation.dagger.PostsActivityModule
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -11,6 +11,6 @@ import dagger.android.ContributesAndroidInjector
 interface RedditModule {
 
     @ActivityScope
-    @ContributesAndroidInjector(modules = [RedditActivityModule::class])
+    @ContributesAndroidInjector(modules = [PostsActivityModule::class])
     fun redditActivityInjector(): PostsActivity
 }

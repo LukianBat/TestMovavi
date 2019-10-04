@@ -9,7 +9,7 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class RedditActivityModule {
+class PostsActivityModule {
 
     @Provides
     fun providePresenter(

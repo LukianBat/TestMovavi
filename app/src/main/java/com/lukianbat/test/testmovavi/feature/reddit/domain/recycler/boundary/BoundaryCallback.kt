@@ -1,69 +1,61 @@
-package com.lukianbat.test.testmovavi.core.utils
+package com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.boundary
 
 import androidx.annotation.MainThread
 import androidx.paging.PagedList
 import com.lukianbat.test.testmovavi.feature.reddit.data.datasource.api.RedditApiDataSource
-import com.lukianbat.test.testmovavi.feature.reddit.domain.model.RedditPost
+import com.lukianbat.test.testmovavi.feature.reddit.domain.model.BasePostImpl
 import com.lukianbat.test.testmovavi.feature.reddit.domain.model.RedditRes
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import okhttp3.ResponseBody
+import com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.helper.PagingRequestHelper
+import com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.helper.createStatusLiveData
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.concurrent.Executor
-import java.util.concurrent.Executors
-import kotlin.reflect.KFunction2
 
 class SubredditBoundaryCallback(
     private val webservice: RedditApiDataSource,
-    private val handleResponse: (RedditRes?) -> Unit,
+    private val handleResponse: (List<BasePostImpl>?) -> Unit,
     private val ioExecutor: Executor
-) : PagedList.BoundaryCallback<RedditPost>() {
+) : PagedList.BoundaryCallback<BasePostImpl>() {
 
-    val helper = PagingRequestHelper(ioExecutor)
+    val helper =
+        PagingRequestHelper(
+            ioExecutor
+        )
     val networkState = helper.createStatusLiveData()
 
-    /**
-     * Database returned 0 items. We should query the backend for more items.
-     */
     @MainThread
     override fun onZeroItemsLoaded() {
         helper.runIfNotRunning(PagingRequestHelper.RequestType.INITIAL) {
-            webservice.getTop()
+            webservice.getRedditTop()
                 .enqueue(createWebserviceCallback(it))
         }
     }
 
-    /**
-     * User reached to the end of the list.
-     */
     @MainThread
-    override fun onItemAtEndLoaded(itemAtEnd: RedditPost) {
+    override fun onItemAtEndLoaded(itemAtEnd: BasePostImpl) {
         helper.runIfNotRunning(PagingRequestHelper.RequestType.AFTER) {
-            webservice.getTopAfter(
+            webservice.getRedditTopAfter(
                 after = itemAtEnd.id
             )
                 .enqueue(createWebserviceCallback(it))
         }
     }
 
-    /**
-     * every time it gets new items, boundary callback simply inserts them into the database and
-     * paging library takes care of refreshing the list if necessary.
-     */
     private fun insertItemsIntoDb(
         response: Response<RedditRes>,
         it: PagingRequestHelper.Request.Callback
     ) {
         ioExecutor.execute {
-            handleResponse(response.body())
+            val res = response.body()?.entries?.map {
+                BasePostImpl(it.author, it.id, it.title, it.date, it.content, it.image)
+            }
+            handleResponse(res)
             it.recordSuccess()
         }
     }
 
-    override fun onItemAtFrontLoaded(itemAtFront: RedditPost) {
-        // ignored, since we only ever append to what's in the DB
+    override fun onItemAtFrontLoaded(itemAtFront: BasePostImpl) {
     }
 
     private fun sortResultByDate(body: RedditRes?): RedditRes? {

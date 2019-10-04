@@ -1,27 +1,26 @@
 package com.lukianbat.test.testmovavi.feature.reddit.data.repository
 
-import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.paging.LivePagedListBuilder
-import com.lukianbat.test.testmovavi.core.utils.Listing
-import com.lukianbat.test.testmovavi.core.utils.NetworkState
-import com.lukianbat.test.testmovavi.core.utils.SubredditBoundaryCallback
+import com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.boundary.Listing
+import com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.boundary.NetworkState
+import com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.boundary.SubredditBoundaryCallback
 import com.lukianbat.test.testmovavi.feature.reddit.data.datasource.api.RedditApiDataSource
 import com.lukianbat.test.testmovavi.feature.reddit.data.datasource.db.RedditCacheDataSource
-import com.lukianbat.test.testmovavi.feature.reddit.domain.model.RedditPost
-import com.lukianbat.test.testmovavi.feature.reddit.domain.model.RedditRes
+import com.lukianbat.test.testmovavi.feature.reddit.domain.model.BasePost
+import com.lukianbat.test.testmovavi.feature.reddit.domain.model.BasePostImpl
+import com.lukianbat.test.testmovavi.feature.reddit.domain.model.MeduzaRes
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.time.LocalDateTime
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
 interface RedditRepository {
-    fun posts(): Listing<RedditPost>
+    fun posts(): Listing<BasePostImpl>
 }
 
 class RedditRepositoryImpl @Inject constructor(
@@ -31,20 +30,27 @@ class RedditRepositoryImpl @Inject constructor(
 
     val ioExecutor = Executors.newSingleThreadExecutor()
 
-    private fun sortResultByDate(body: RedditRes?): RedditRes? {
-        val postList = body?.entries?.sortedByDescending { it.date }
-        return postList?.let { RedditRes(it) }
+    private fun sortResultByDate(list: List<BasePost>?): List<BasePostImpl>? {
+        val postList = list?.sortedByDescending { it.date }
+        val resList = postList?.map {
+            BasePostImpl(it.author, it.id, it.title, it.date, it.content, it.image)
+        }
+        return postList?.let { (resList) }
     }
 
-    private fun insertResultIntoDb(body: RedditRes?) {
-        body!!.entries.let { posts ->
+    private fun insertResultIntoDb(list: List<BasePostImpl>?) {
+        list?.let { posts ->
             val start = cacheDataSource.getNextIndex()
-            posts.forEach {
-                Log.i("TAG", "date = "+it.date)
-            }
             val items = posts.mapIndexed { index, child ->
                 child.indexInResponse = start + index
-                child
+                BasePostImpl(
+                    child.author,
+                    child.id,
+                    child.title,
+                    child.date,
+                    child.content,
+                    child.image
+                )
             }
             cacheDataSource.insert(items)
         }
@@ -54,20 +60,23 @@ class RedditRepositoryImpl @Inject constructor(
     private fun refresh(): LiveData<NetworkState> {
         val networkState = MutableLiveData<NetworkState>()
         networkState.value = NetworkState.LOADING
-        apiDataSource.getTop().enqueue(
-            object : Callback<RedditRes> {
-                override fun onFailure(call: Call<RedditRes>, t: Throwable) {
-                    // retrofit calls this on main thread so safe to call set value
+        apiDataSource.getMeduzaPosts().enqueue(
+            object : Callback<MeduzaRes> {
+                override fun onFailure(call: Call<MeduzaRes>, t: Throwable) {
                     networkState.value = NetworkState.error(t.message)
                 }
 
                 override fun onResponse(
-                    call: Call<RedditRes>,
-                    response: Response<RedditRes>
+                    call: Call<MeduzaRes>,
+                    meduzaResponse: Response<MeduzaRes>
                 ) {
                     ioExecutor.execute {
                         cacheDataSource.delete()
-                        insertResultIntoDb(sortResultByDate(response.body()))
+                        insertResultIntoDb(meduzaResponse.body()?.entries?.map {
+                            BasePostImpl(it.author, it.id, it.title, it.date, it.content, it.image)
+                        })
+                        val redditResponse = apiDataSource.getRedditTop().execute().body()
+                        insertResultIntoDb(sortResultByDate(redditResponse?.entries))
                         networkState.postValue(NetworkState.LOADED)
                     }
                 }
@@ -76,18 +85,19 @@ class RedditRepositoryImpl @Inject constructor(
         return networkState
     }
 
-    override fun posts(): Listing<RedditPost> {
+    override fun posts(): Listing<BasePostImpl> {
 
-        val boundaryCallback = SubredditBoundaryCallback(
-            webservice = apiDataSource,
-            handleResponse = this::insertResultIntoDb,
-            ioExecutor = ioExecutor
-        )
+        val boundaryCallback =
+            SubredditBoundaryCallback(
+                webservice = apiDataSource,
+                handleResponse = this::insertResultIntoDb,
+                ioExecutor = ioExecutor
+            )
         val refreshTrigger = MutableLiveData<Unit>()
         val refreshState = Transformations.switchMap(refreshTrigger) {
             refresh()
         }
-        val livePagedList = LivePagedListBuilder(cacheDataSource.posts(), 10)
+        val livePagedList = LivePagedListBuilder(cacheDataSource.posts(), LIMIT)
             .setBoundaryCallback(boundaryCallback)
             .build()
 
@@ -105,6 +115,6 @@ class RedditRepositoryImpl @Inject constructor(
     }
 
     companion object {
-        const val LIMIT = 10
+        const val LIMIT = 20
     }
 }

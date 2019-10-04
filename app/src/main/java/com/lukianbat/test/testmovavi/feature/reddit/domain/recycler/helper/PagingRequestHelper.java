@@ -1,4 +1,4 @@
-package com.lukianbat.test.testmovavi.core.utils;
+package com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.helper;
 /* Copyright 2017 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,7 +48,7 @@ import androidx.paging.DataSource;
  *     {@literal @}Override
  *     public void onItemAtFrontLoaded({@literal @}NonNull MyItem itemAtFront) {
  *         helper.runIfNotRunning(com.memebattle.pagingwithrepository.domain.util.PagingRequestHelper.RequestType.BEFORE,
- *                 helperCallback -> api.getTopBefore(itemAtFront.getName(), 10).enqueue(
+ *                 helperCallback -> api.getRedditTopBefore(itemAtFront.getName(), 10).enqueue(
  *                         new Callback&lt;ApiResponse>() {
  *                             {@literal @}Override
  *                             public void onResponse(Call&lt;ApiResponse> call,
@@ -67,7 +67,7 @@ import androidx.paging.DataSource;
  *     {@literal @}Override
  *     public void onItemAtEndLoaded({@literal @}NonNull MyItem itemAtEnd) {
  *         helper.runIfNotRunning(com.memebattle.pagingwithrepository.domain.util.PagingRequestHelper.RequestType.AFTER,
- *                 helperCallback -> api.getTopBefore(itemAtEnd.getName(), 10).enqueue(
+ *                 helperCallback -> api.getRedditTopBefore(itemAtEnd.getName(), 10).enqueue(
  *                         new Callback&lt;ApiResponse>() {
  *                             {@literal @}Override
  *                             public void onResponse(Call&lt;ApiResponse> call,

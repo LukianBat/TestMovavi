@@ -8,8 +8,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.lukianbat.test.testmovavi.R
-import com.lukianbat.test.testmovavi.core.utils.NetworkState
-import com.lukianbat.test.testmovavi.core.utils.Status
+import com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.boundary.NetworkState
+import com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.boundary.Status
 
 class NetworkStateItemViewHolder(
     view: View,

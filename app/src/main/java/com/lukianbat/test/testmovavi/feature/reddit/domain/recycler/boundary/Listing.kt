@@ -1,4 +1,4 @@
-package com.lukianbat.test.testmovavi.core.utils
+package com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.boundary
 
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList

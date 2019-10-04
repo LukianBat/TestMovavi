@@ -7,21 +7,28 @@ import retrofit2.http.Query
 
 
 interface RedditApi {
-    @GET("/.rss")
+    @GET(URL_TOP)
     fun getTop(
-        @Query("limit") limit: Int
+        @Query(LIMIT) limit: Int
     ): Call<RedditRes>
 
 
-    @GET("/.rss")
+    @GET(URL_TOP)
     fun getTopAfter(
-        @Query("after") after: String,
-        @Query("limit") limit: Int
+        @Query(AFTER) after: String,
+        @Query(LIMIT) limit: Int
     ): Call<RedditRes>
 
-    @GET("/.rss")
+    @GET(URL_TOP)
     fun getTopBefore(
-        @Query("before") before: String,
-        @Query("limit") limit: Int
+        @Query(BEFORE) before: String,
+        @Query(LIMIT) limit: Int
     ): Call<RedditRes>
+
+    companion object {
+        const val URL_TOP = "/r/all/.rss?sort=new"
+        const val BEFORE = "before"
+        const val AFTER = "after"
+        const val LIMIT = "limit"
+    }
 }
