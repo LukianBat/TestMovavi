@@ -1,9 +1,13 @@
 package com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.boundary
 
+import android.util.Log
 import androidx.annotation.MainThread
 import androidx.paging.PagedList
+import com.lukianbat.test.testmovavi.core.utils.sortByDate
 import com.lukianbat.test.testmovavi.feature.reddit.data.datasource.api.RedditApiDataSource
+import com.lukianbat.test.testmovavi.feature.reddit.domain.model.BasePost
 import com.lukianbat.test.testmovavi.feature.reddit.domain.model.BasePostImpl
+import com.lukianbat.test.testmovavi.feature.reddit.domain.model.MeduzaRes
 import com.lukianbat.test.testmovavi.feature.reddit.domain.model.RedditRes
 import com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.helper.PagingRequestHelper
 import com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.helper.createStatusLiveData
@@ -26,9 +30,29 @@ class SubredditBoundaryCallback(
 
     @MainThread
     override fun onZeroItemsLoaded() {
+        val baseList = arrayListOf<BasePost>()
         helper.runIfNotRunning(PagingRequestHelper.RequestType.INITIAL) {
-            webservice.getRedditTop()
-                .enqueue(createWebserviceCallback(it))
+            webservice.getMeduzaPosts().enqueue(object : Callback<MeduzaRes> {
+                override fun onFailure(call: Call<MeduzaRes>, t: Throwable) {
+                    it.recordFailure(t)
+                }
+
+                override fun onResponse(call: Call<MeduzaRes>, response: Response<MeduzaRes>) {
+                    ioExecutor.execute {
+                        webservice.getRedditTop().execute().body()?.entries?.let { list ->
+                            baseList.addAll(
+                                list
+                            )
+                        }
+                        response.body()?.entries?.let { list ->
+                            baseList.addAll(
+                                list
+                            )
+                        }
+                        insertItemsIntoDb(baseList.sortByDate(), it)
+                    }
+                }
+            })
         }
     }
 
@@ -43,24 +67,16 @@ class SubredditBoundaryCallback(
     }
 
     private fun insertItemsIntoDb(
-        response: Response<RedditRes>,
+        res: List<BasePostImpl>,
         it: PagingRequestHelper.Request.Callback
     ) {
         ioExecutor.execute {
-            val res = response.body()?.entries?.map {
-                BasePostImpl(it.author, it.id, it.title, it.date, it.content, it.image)
-            }
             handleResponse(res)
             it.recordSuccess()
         }
     }
 
     override fun onItemAtFrontLoaded(itemAtFront: BasePostImpl) {
-    }
-
-    private fun sortResultByDate(body: RedditRes?): RedditRes? {
-        val postList = body?.entries?.sortedByDescending { it.date }
-        return postList?.let { RedditRes(it) }
     }
 
 
@@ -75,8 +91,8 @@ class SubredditBoundaryCallback(
                 call: Call<RedditRes>,
                 response: Response<RedditRes>
             ) {
-                val res = Response.success(sortResultByDate(response.body()))
-                insertItemsIntoDb(res, it)
+                val resList = response.body()?.entries
+                resList?.sortByDate()?.let { list -> insertItemsIntoDb(list, it) }
             }
         }
     }

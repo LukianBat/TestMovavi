@@ -12,6 +12,7 @@ class PostItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     private val title: TextView = view.findViewById(R.id.title)
     private val date: TextView = view.findViewById(R.id.date)
     private val content: TextView = view.findViewById(R.id.content)
+    private val author: TextView = view.findViewById(R.id.author)
     private var post: BasePost? = null
     private var check = false
 
@@ -31,6 +32,7 @@ class PostItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         this.post = post
         title.text = post?.title ?: "loading"
         content.text = post?.content ?: "unknown"
+        author.text = post?.author ?: ""
         date.text = post?.date ?: "unknown"
     }
 

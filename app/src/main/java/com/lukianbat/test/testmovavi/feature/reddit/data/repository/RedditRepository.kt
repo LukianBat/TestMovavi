@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.paging.LivePagedListBuilder
+import com.lukianbat.test.testmovavi.core.utils.sortByDate
 import com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.boundary.Listing
 import com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.boundary.NetworkState
 import com.lukianbat.test.testmovavi.feature.reddit.domain.recycler.boundary.SubredditBoundaryCallback
@@ -30,13 +31,6 @@ class RedditRepositoryImpl @Inject constructor(
 
     val ioExecutor = Executors.newSingleThreadExecutor()
 
-    private fun sortResultByDate(list: List<BasePost>?): List<BasePostImpl>? {
-        val postList = list?.sortedByDescending { it.date }
-        val resList = postList?.map {
-            BasePostImpl(it.author, it.id, it.title, it.date, it.content, it.image)
-        }
-        return postList?.let { (resList) }
-    }
 
     private fun insertResultIntoDb(list: List<BasePostImpl>?) {
         list?.let { posts ->
@@ -59,6 +53,7 @@ class RedditRepositoryImpl @Inject constructor(
     @MainThread
     private fun refresh(): LiveData<NetworkState> {
         val networkState = MutableLiveData<NetworkState>()
+        val baseList = arrayListOf<BasePost>()
         networkState.value = NetworkState.LOADING
         apiDataSource.getMeduzaPosts().enqueue(
             object : Callback<MeduzaRes> {
@@ -72,11 +67,17 @@ class RedditRepositoryImpl @Inject constructor(
                 ) {
                     ioExecutor.execute {
                         cacheDataSource.delete()
-                        insertResultIntoDb(meduzaResponse.body()?.entries?.map {
-                            BasePostImpl(it.author, it.id, it.title, it.date, it.content, it.image)
-                        })
-                        val redditResponse = apiDataSource.getRedditTop().execute().body()
-                        insertResultIntoDb(sortResultByDate(redditResponse?.entries))
+                        meduzaResponse.body()?.entries?.let { list ->
+                            baseList.addAll(
+                                list
+                            )
+                        }
+                        apiDataSource.getRedditTop().execute().body()?.entries?.let { list ->
+                            baseList.addAll(
+                                list
+                            )
+                        }
+                        insertResultIntoDb(baseList.sortByDate())
                         networkState.postValue(NetworkState.LOADED)
                     }
                 }
