@@ -28,3 +28,6 @@ RSS-reader
 В приложении хорошо работает пагинация с Reddit, однако сортировка по дате и времени реализуется только на отдельно подгружаемой странице.   
 Сделал кэширование пагинации по мотивам https://habr.com/ru/post/431212/    
 # Скриншоты
+![скриншот](https://github.com/LukianBat/TestMovavi/blob/master/AueE3Rdk68s.jpg)        
+![скриншот](https://github.com/LukianBat/TestMovavi/blob/master/Tf99M50LWtY.jpg)        
+
