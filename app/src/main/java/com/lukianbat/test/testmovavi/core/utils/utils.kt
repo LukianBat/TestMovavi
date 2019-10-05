@@ -1,7 +1,7 @@
 package com.lukianbat.test.testmovavi.core.utils
 
-import com.lukianbat.test.testmovavi.feature.reddit.domain.model.BasePost
-import com.lukianbat.test.testmovavi.feature.reddit.domain.model.BasePostImpl
+import com.lukianbat.test.testmovavi.feature.posts.domain.model.BasePost
+import com.lukianbat.test.testmovavi.feature.posts.domain.model.BasePostImpl
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -9,8 +9,12 @@ const val BASE_DATE_FORMAT = "EEE MMM dd HH:mm:ss zzz yyyy"
 const val MEDUZA_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss Z"
 const val REDDIT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
 
+fun BasePost.toBaseImpl(): BasePostImpl =
+    BasePostImpl(this.author, this.id, this.title, this.date, this.content, this.image)
+
+
 fun List<BasePost>.toBaseImpl(): List<BasePostImpl> = this.map {
-    BasePostImpl(it.author, it.id, it.title, it.date, it.content, it.image)
+    it.toBaseImpl()
 }
 
 fun List<BasePost>.sortByDate(): List<BasePostImpl> {

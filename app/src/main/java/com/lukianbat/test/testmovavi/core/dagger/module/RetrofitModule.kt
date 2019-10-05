@@ -2,11 +2,8 @@ package com.lukianbat.test.testmovavi.core.dagger.module
 
 import dagger.Module
 import dagger.Provides
-import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory
 import javax.inject.Named
 
@@ -14,7 +11,6 @@ import javax.inject.Named
 class RetrofitModule {
 
     private val httpClient = OkHttpClient.Builder()
-        .addNetworkInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
         .build()
 
     @Provides
@@ -22,7 +18,6 @@ class RetrofitModule {
     fun providesRedditRetrofit(): Retrofit =
         Retrofit.Builder()
             .baseUrl(REDDIT_URL)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
             .addConverterFactory(SimpleXmlConverterFactory.create())
             .client(httpClient)
             .build()
@@ -32,7 +27,6 @@ class RetrofitModule {
     fun providesMeduzaRetrofit(): Retrofit =
         Retrofit.Builder()
             .baseUrl(MEDUZA_URL)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
             .addConverterFactory(SimpleXmlConverterFactory.create())
             .client(httpClient)
             .build()

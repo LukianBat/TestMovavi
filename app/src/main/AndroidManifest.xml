@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".feature.reddit.presentation.PostsActivity">
+        <activity android:name=".feature.posts.presentation.PostsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

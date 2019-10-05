@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.lukianbat.test.testmovavi.feature.reddit.presentation.PostsViewModel" />
+            type="com.lukianbat.test.testmovavi.feature.posts.presentation.PostsViewModel" />
     </data>
 
     <LinearLayout
