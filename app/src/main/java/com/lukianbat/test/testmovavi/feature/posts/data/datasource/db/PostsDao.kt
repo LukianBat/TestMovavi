@@ -10,12 +10,9 @@ interface PostsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(posts: List<BasePostImpl>)
 
-    @Query("SELECT * FROM posts ORDER BY indexInResponse ASC")
+    @Query("SELECT * FROM posts ORDER BY date DESC")
     fun posts(): DataSource.Factory<Int, BasePostImpl>
 
     @Query("DELETE FROM posts")
     fun delete()
-
-    @Query("SELECT MAX(indexInResponse) + 1 FROM posts")
-    fun getNextIndex(): Int
 }

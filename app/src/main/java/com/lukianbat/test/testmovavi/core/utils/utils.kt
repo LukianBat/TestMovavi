@@ -5,7 +5,6 @@ import com.lukianbat.test.testmovavi.feature.posts.domain.model.BasePostImpl
 import java.text.SimpleDateFormat
 import java.util.*
 
-const val BASE_DATE_FORMAT = "EEE MMM dd HH:mm:ss zzz yyyy"
 const val MEDUZA_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss Z"
 const val REDDIT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
 
@@ -17,7 +16,7 @@ fun List<BasePost>.toBaseImpl(): List<BasePostImpl> = this.map {
     it.toBaseImpl()
 }
 
-fun List<BasePost>.sortByDate(): List<BasePostImpl> {
+fun List<BasePost>.convertDate(): List<BasePostImpl> {
     this.forEach {
         val date: String
         date = if (it.id == "") {
@@ -29,9 +28,5 @@ fun List<BasePost>.sortByDate(): List<BasePostImpl> {
         }
         it.date = date
     }
-    return this.toBaseImpl().sortedByDescending {
-        val format = SimpleDateFormat(BASE_DATE_FORMAT, Locale.ENGLISH)
-        val date = format.parse(it.date)
-        date
-    }
+    return this.toBaseImpl()
 }

@@ -5,8 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.paging.LivePagedListBuilder
-import com.lukianbat.test.testmovavi.core.utils.sortByDate
-import com.lukianbat.test.testmovavi.core.utils.toBaseImpl
+import com.lukianbat.test.testmovavi.core.utils.convertDate
 import com.lukianbat.test.testmovavi.feature.posts.domain.recycler.boundary.Listing
 import com.lukianbat.test.testmovavi.feature.posts.domain.recycler.boundary.NetworkState
 import com.lukianbat.test.testmovavi.feature.posts.domain.recycler.boundary.SubredditBoundaryCallback
@@ -35,12 +34,8 @@ class PostsRepositoryImpl @Inject constructor(
 
     private fun insertResultIntoDb(list: List<BasePostImpl>?) {
         list?.let { posts ->
-            val start = cacheDataSource.getNextIndex()
-            val items = posts.mapIndexed { index, child ->
-                child.indexInResponse = start + index
-                child.toBaseImpl()
-            }
-            cacheDataSource.insert(items)
+
+            cacheDataSource.insert(list)
         }
     }
 
@@ -71,7 +66,7 @@ class PostsRepositoryImpl @Inject constructor(
                                 list
                             )
                         }
-                        insertResultIntoDb(baseList.sortByDate())
+                        insertResultIntoDb(baseList.convertDate())
                         networkState.postValue(NetworkState.LOADED)
                     }
                 }

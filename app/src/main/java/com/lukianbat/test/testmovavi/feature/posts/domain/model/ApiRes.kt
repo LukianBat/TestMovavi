@@ -10,7 +10,6 @@ interface BasePost {
     var date: String
     var content: String
     var image: String
-    var indexInResponse: Int
 }
 
 @Entity(tableName = "posts")
@@ -21,9 +20,7 @@ class BasePostImpl(
     override var date: String,
     override var content: String,
     override var image: String = ""
-) : BasePost {
-    override var indexInResponse: Int = -1
-}
+) : BasePost
 
 @Root(name = "entry", strict = false)
 class RedditPost(
@@ -45,7 +42,6 @@ class RedditPost(
     @param:Element(name = "content")
     override var content: String
 ) : BasePost {
-    override var indexInResponse: Int = -1
     override var image: String = ""
 }
 
@@ -64,7 +60,6 @@ data class MeduzaPost(
     override var author: String = "meduza"
     override var image: String = ""
     override var id: String = ""
-    override var indexInResponse: Int = -1
 }
 
 @Root(name = "rss", strict = false)

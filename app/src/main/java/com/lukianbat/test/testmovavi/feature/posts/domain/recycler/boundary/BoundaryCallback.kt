@@ -2,7 +2,7 @@ package com.lukianbat.test.testmovavi.feature.posts.domain.recycler.boundary
 
 import androidx.annotation.MainThread
 import androidx.paging.PagedList
-import com.lukianbat.test.testmovavi.core.utils.sortByDate
+import com.lukianbat.test.testmovavi.core.utils.convertDate
 import com.lukianbat.test.testmovavi.feature.posts.data.datasource.api.RedditApiDataSource
 import com.lukianbat.test.testmovavi.feature.posts.domain.model.BasePost
 import com.lukianbat.test.testmovavi.feature.posts.domain.model.BasePostImpl
@@ -21,6 +21,7 @@ class SubredditBoundaryCallback(
     private val ioExecutor: Executor
 ) : PagedList.BoundaryCallback<BasePostImpl>() {
 
+    private var lastItemId: String = ""
     val helper =
         PagingRequestHelper(
             ioExecutor
@@ -39,6 +40,7 @@ class SubredditBoundaryCallback(
                 override fun onResponse(call: Call<MeduzaRes>, response: Response<MeduzaRes>) {
                     ioExecutor.execute {
                         webservice.getRedditTop().execute().body()?.entries?.let { list ->
+                            lastItemId = list.last().id
                             baseList.addAll(
                                 list
                             )
@@ -48,7 +50,7 @@ class SubredditBoundaryCallback(
                                 list
                             )
                         }
-                        insertItemsIntoDb(baseList.sortByDate(), it)
+                        insertItemsIntoDb(baseList.convertDate(), it)
                     }
                 }
             })
@@ -59,7 +61,7 @@ class SubredditBoundaryCallback(
     override fun onItemAtEndLoaded(itemAtEnd: BasePostImpl) {
         helper.runIfNotRunning(PagingRequestHelper.RequestType.AFTER) {
             webservice.getRedditTopAfter(
-                after = itemAtEnd.id
+                after = lastItemId
             )
                 .enqueue(createWebserviceCallback(it))
         }
@@ -91,7 +93,8 @@ class SubredditBoundaryCallback(
                 response: Response<RedditRes>
             ) {
                 val resList = response.body()?.entries
-                resList?.sortByDate()?.let { list -> insertItemsIntoDb(list, it) }
+                lastItemId = resList?.last()?.id ?: lastItemId
+                resList?.convertDate()?.let { list -> insertItemsIntoDb(list, it) }
             }
         }
     }
